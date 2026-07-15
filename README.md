@@ -49,7 +49,7 @@ Created by **VirajVerse**.
    ```
 4. **Run the script**:
    ```bash
-   python steering_wheel.py
+   python verse_steering_wheel.py
    ```
 
 ---
@@ -74,7 +74,7 @@ Because macOS has strict security controls around camera access and keyboard sim
    - Toggle the switch to **On**.
 5. **Run the script**:
    ```bash
-   python3 steering_wheel.py
+   python3 verse_steering_wheel.py
    ```
 
 *Note: The native Win32 window transparency and window-zoom features are disabled on macOS; instead, the window safely falls back to standard scaling.*
@@ -98,7 +98,7 @@ Drop/Remove hands    →   Emergency Brake (releases all keys instantly)
 
 ---
 
-## ⚙️ Configuration (Top of `steering_wheel.py`)
+## ⚙️ Configuration (Top of `verse_steering_wheel.py`)
 
 You can edit these parameters at the top of the file to tweak the steering response:
 

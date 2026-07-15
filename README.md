@@ -4,6 +4,8 @@ Control any racing game using your hands as a virtual steering wheel — no phys
 
 Created by **VirajVerse**.
 
+![Virtual Steering Wheel](./assets/steering_wheel.png)
+
 ---
 
 ## ✨ Features

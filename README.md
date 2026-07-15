@@ -1,116 +1,116 @@
 # 🎮 Virtual Steering Wheel — MediaPipe + Python
 
-Control any car game using your hands as a steering wheel — no hardware needed. Just your webcam.
+Control any racing game using your hands as a virtual steering wheel — no physical hardware needed! Just your webcam.
+
+Created by **VirajVerse**.
 
 ---
 
-## How It Works
+## ✨ Features
 
-Hold both fists toward the camera like you're gripping a steering wheel. Tilt your hands to steer.
-
-```
-Both hands level  →  Straight (no key pressed)
-Tilt LEFT         →  ← LEFT arrow key
-Tilt RIGHT        →  → RIGHT arrow key
-Remove hands      →  All keys released instantly
-```
-
----
-
-## Requirements
-
-- Python 3.9+
-- Webcam
+- 🏎️ **Zero-Hardware Control**: Use your webcam and hands to steer, accelerate, brake, and use nitro.
+- 📺 **Intelligent Auto-Scaling HUD**: The overlay window starts small (`320x240`) by default so it doesn't block your game.
+- ⚡ **Instant Maximize Shortcut**: Press **`M`** (or click the maximize button) to enlarge the window to full view, which automatically shrinks back to small after **15 seconds**.
+- 🌟 **Neon Tech HUD**: Includes wrist crosshairs, connecting vector line, slider telemetry, speed/FPS counters, and active status indicators.
+- 🚀 **Brakes & Nitro**:
+  - Make a **Fist with your Left Hand** to brake (sends `Down Arrow` key, releases `W`).
+  - Make a **Fist with your Right Hand** to activate Nitro (sends `Spacebar` key).
+  - Keep hands open to auto-accelerate (sends `W` key).
 
 ---
 
-## Install Dependencies
+## 🛠️ Requirements
 
-```bash
-pip install mediapipe opencv-python pynput numpy
-```
+### 1. Python Version
+- Recommended: **Python 3.9 to 3.11** (MediaPipe has standard pre-built wheels for these versions).
+- Python 3.12+ can also be used, but ensure you have the compatible `mediapipe` version installed.
+- **Download Python**: [python.org/downloads](https://www.python.org/downloads/) (Make sure to check the box **"Add Python to PATH"** during installation).
 
----
-
-## Run
-
-```bash
-python3 steering_wheel.py
-```
-
-Press **Q** in the camera window to quit.
+### 2. Hardware
+- Any standard built-in or external USB Webcam.
 
 ---
 
-## macOS Setup ⚠️
+## 🚀 Installation & Setup
 
-This project was built and tested on **macOS (Apple M2)**. On macOS you must grant camera permission to Terminal before running:
+### 📦 Windows Setup
 
-1. Go to **System Settings → Privacy & Security → Camera**
-2. Enable access for **Terminal** (or your Python launcher)
-3. Run the script again
-
----
-
-## Windows Setup
-
-The script works on Windows with **one small change**. Open `steering_wheel.py` and find this line:
-
-```python
-backend = cv2.CAP_AVFOUNDATION if platform.system() == "Darwin" else cv2.CAP_ANY
-```
-
-This line already auto-detects your OS — **no manual change needed**. On Windows it will automatically use `cv2.CAP_ANY` (DirectShow/MSMF).
-
-**Steps for Windows:**
-
-1. Install Python from https://python.org
-
-2. Install dependencies:
+1. **Install Python**: Download and run the installer. Remember to check **"Add Python to PATH"**.
+2. **Open Command Prompt (CMD)** or PowerShell in this directory.
+3. **Install Dependencies**:
    ```bash
-   pip install mediapipe opencv-python pynput numpy
+   pip install -r requirements.txt
    ```
-
-3. Run:
+   *Alternatively, install them manually:*
+   ```bash
+   pip install opencv-python mediapipe pynput numpy
+   ```
+4. **Run the script**:
    ```bash
    python steering_wheel.py
    ```
 
-4. If the camera doesn't open, try changing `CAMERA_INDEX` at the top of `steering_wheel.py`:
-   ```python
-   CAMERA_INDEX = 0   # try 0, 1, or 2
+---
+
+### 🍎 macOS Setup & Compatibility
+
+This project is **fully compatible with macOS** (Intel and Apple Silicon / M-series chips). 
+
+Because macOS has strict security controls around camera access and keyboard simulation, follow these steps:
+
+1. **Install Python**: Install Python via [python.org](https://www.python.org/downloads/) or via Homebrew (`brew install python`).
+2. **Install Dependencies**:
+   ```bash
+   pip3 install opencv-python mediapipe pynput numpy
+   ```
+3. **Grant Camera Permissions**:
+   When you run the script, macOS will pop up a window asking for camera access for Terminal/VSCode. If not prompted, go to **System Settings → Privacy & Security → Camera** and ensure your Terminal application is allowed.
+4. **Grant Accessibility Permissions (Important for Keyboard emulation)**:
+   Since the script simulates keyboard inputs using `pynput`, macOS requires Accessibility permissions:
+   - Go to **System Settings → Privacy & Security → Accessibility**.
+   - Click the `+` icon and add your terminal application (e.g., Terminal, iTerm2, or VS Code).
+   - Toggle the switch to **On**.
+5. **Run the script**:
+   ```bash
+   python3 steering_wheel.py
    ```
 
-> **Note for Windows:** You may see a Windows Security prompt asking if Python can access your camera — click **Allow**.
+*Note: The native Win32 window transparency and window-zoom features are disabled on macOS; instead, the window safely falls back to standard scaling.*
 
 ---
 
-## Config (top of `steering_wheel.py`)
+## 🎮 How to Control
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `CAMERA_INDEX` | `0` | `0` = built-in webcam, `1` = external USB camera |
-| `DEAD_ZONE_DEG` | `12` | Degrees of tilt to ignore at center (prevents jitter) |
-| `FLIP_CAMERA` | `True` | Mirror the feed (selfie view). Set `False` for some external cameras |
-| `GRACE_FRAMES` | `8` | Frames to wait before releasing keys when hands disappear |
+```
+Both hands level     →   Straight (W held for auto-acceleration)
+Tilt hands left      →   Steer LEFT (Left Arrow key pressed)
+Tilt hands right     →   Steer RIGHT (Right Arrow key pressed)
+Fist (Left hand)     →   Brake (releases W, presses Down Arrow key)
+Fist (Right hand)    →   Nitro (presses Spacebar)
+Drop/Remove hands    →   Emergency Brake (releases all keys instantly)
+```
 
----
-
-## Troubleshooting
-
-| Problem | Fix |
-|---------|-----|
-| `[ERROR] Cannot open camera` | Check `CAMERA_INDEX` — try `0`, `1`, `2` |
-| Steering is reversed | Toggle `FLIP_CAMERA = False` in config |
-| Keys stuck after removing hands | Hands must be fully out of frame for ~8 frames |
-| Low FPS / laggy | Lower camera resolution in the script or close other apps |
+### ⌨️ Keyboard Shortcuts (Inside the window)
+- **`M` / `m`**: Maximize the camera overlay window for 15 seconds.
+- **`Q` / `q` / `ESC`**: Quit the application and release all keys safely.
 
 ---
 
-## Works With Any Game That Uses Arrow Keys
+## ⚙️ Configuration (Top of `steering_wheel.py`)
 
-- Google Chrome Dinosaur game
-- Trackmania
-- TORCS
-- Hill Climb Racing (browser)
-- Any browser/PC racing game using arrow keys
+You can edit these parameters at the top of the file to tweak the steering response:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `CAMERA_INDEX` | `0` | Camera source (`0` for default webcam, `1`/`2` for external USB camera). |
+| `DEAD_ZONE_DEG` | `15` | Degrees of steering tilt to ignore at the center (prevents vehicle jitter). |
+| `SOFT_ZONE_DEG` | `30` | Max steering angle tilt limit. |
+| `FLIP_CAMERA` | `True` | Mirrors the camera feed (selfie-mode view). |
+| `TRANSPARENT_HUD`| `True` | (Windows only) Creates a futuristic borderless transparent HUD overlay on your desktop. |
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](file:///e:/Taliyo%20Tech/VirajVerse/gesture%20os%20c++/virtual-steering-wheel/LICENSE) file for details.
+Created with ❤️ by **VirajVerse**.

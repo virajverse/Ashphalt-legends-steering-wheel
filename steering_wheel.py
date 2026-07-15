@@ -462,8 +462,8 @@ def is_fist(hand_landmarks) -> bool:
 
 
 def main():
-    window_hud = "Virtual Steering Wheel HUD"
-    window_ctrl = "Virtual Steering Wheel Controller"
+    window_hud = "Verse Steering Wheel HUD"
+    window_ctrl = "Verse Steering Wheel Controller"
     
     cv2.namedWindow(window_hud, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(window_hud, 320, 240)  # Start with a small, neat size
@@ -500,7 +500,7 @@ def main():
     lost_frames  = 0
 
     print("=" * 60)
-    print("  Virtual Steering Wheel  |  Press Q to quit, M to maximize")
+    print("  Verse Steering Wheel  |  Press Q to quit, M to maximize")
     print("  -> Auto-acceleration ('w') is enabled when hands are detected.")
     print("  -> Nitro (Spacebar) is triggered by making a fist with EITHER hand.")
     print("  -> Press M to maximize / restore (toggle) the window. Auto-shrinks after 15 seconds.")

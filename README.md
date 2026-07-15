@@ -1,10 +1,10 @@
-# 🎮 Virtual Steering Wheel — MediaPipe + Python
+# 🎮 Verse Steering Wheel — MediaPipe + Python
 
 Control any racing game using your hands as a virtual steering wheel — no physical hardware needed! Just your webcam.
 
 Created by **VirajVerse**.
 
-![Virtual Steering Wheel](./assets/steering_wheel.png)
+![Verse Steering Wheel](./assets/steering_wheel.png)
 
 ---
 

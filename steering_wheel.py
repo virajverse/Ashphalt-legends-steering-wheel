@@ -498,17 +498,13 @@ def main():
     print("  Virtual Steering Wheel  |  Press Q to quit, M to maximize")
     print("  -> Auto-acceleration ('w') is enabled when hands are detected.")
     print("  -> Nitro (Spacebar) is triggered by making a fist with EITHER hand.")
-    print("  -> Press M to maximize the window for 15 seconds.")
+    print("  -> Press M to maximize / restore (toggle) the window.")
     print("=" * 60)
 
     frame_count = 0
     win_w, win_h = 320, 240
     transparency_applied = False
     blank_frame = np.zeros((480, 640, 3), dtype=np.uint8) if TRANSPARENT_HUD else None
-
-    is_large = False
-    large_start_time = None
-    cooldown_until = time.time() + 2.0  # 2 seconds cooldown on startup
 
     try:
         while True:
@@ -603,39 +599,6 @@ def main():
                 except Exception:
                     pass
 
-            # Detect if window became large (either maximized or manually resized)
-            current_time = time.time()
-            if current_time > cooldown_until:
-                is_currently_large = False
-                if platform.system() == "Windows":
-                    try:
-                        import ctypes
-                        hwnd = ctypes.windll.user32.FindWindowW(None, window_name)
-                        if hwnd != 0 and ctypes.windll.user32.IsZoomed(hwnd):
-                            is_currently_large = True
-                    except Exception:
-                        pass
-                
-                # Also check size threshold
-                if win_w > 350 or win_h > 270:
-                    is_currently_large = True
-
-                if is_currently_large:
-                    if not is_large:
-                        is_large = True
-                        large_start_time = current_time
-                        print("[INFO] Window maximized/resized to large. Timer started for 15 seconds.")
-                    else:
-                        # If already large, check if 15 seconds have passed
-                        if current_time - large_start_time >= 15.0:
-                            print("[INFO] 15 seconds elapsed. Shrinking window back to small.")
-                            restore_and_shrink_window(window_name)
-                            is_large = False
-                            cooldown_until = current_time + 2.0
-                            win_w, win_h = 320, 240
-                else:
-                    is_large = False
-
             # Only resize if the window dimensions differ from the frame dimensions
             if win_w > 10 and win_h > 10 and (win_w != w or win_h != h):
                 display_frame = cv2.resize(display_frame, (win_w, win_h), interpolation=cv2.INTER_LINEAR)
@@ -650,7 +613,28 @@ def main():
             if key in (ord('q'), ord('Q'), 27):
                 break
             elif key in (ord('m'), ord('M')):
-                maximize_window(window_name)
+                # Detect if window is currently large (either maximized or manually resized)
+                is_currently_large = False
+                if platform.system() == "Windows":
+                    try:
+                        import ctypes
+                        hwnd = ctypes.windll.user32.FindWindowW(None, window_name)
+                        if hwnd != 0 and ctypes.windll.user32.IsZoomed(hwnd):
+                            is_currently_large = True
+                    except Exception:
+                        pass
+                
+                if win_w > 350 or win_h > 270:
+                    is_currently_large = True
+
+                if is_currently_large:
+                    print("[INFO] Shortcut: Shrinking window.")
+                    restore_and_shrink_window(window_name)
+                    win_w, win_h = 320, 240
+                else:
+                    print("[INFO] Shortcut: Maximizing window.")
+                    maximize_window(window_name)
+                    win_w, win_h = 1280, 960
 
     finally:
         controller.release_all()

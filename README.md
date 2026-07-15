@@ -10,7 +10,7 @@ Created by **VirajVerse**.
 
 - 🏎️ **Zero-Hardware Control**: Use your webcam and hands to steer, accelerate, brake, and use nitro.
 - 📺 **Intelligent Auto-Scaling HUD**: The overlay window starts small (`320x240`) by default so it doesn't block your game.
-- ⚡ **Instant Maximize Shortcut**: Press **`M`** (or click the maximize button) to enlarge the window to full view, which automatically shrinks back to small after **15 seconds**.
+- ⚡ **Toggle Maximize Shortcut**: Press **`M`** (or click the maximize button) to toggle the window size between small (`320x240`) and maximized view repeatedly.
 - 🌟 **Neon Tech HUD**: Includes wrist crosshairs, connecting vector line, slider telemetry, speed/FPS counters, and active status indicators.
 - 🚀 **Brakes & Nitro**:
   - Make a **Fist with your Left Hand** to brake (sends `Down Arrow` key, releases `W`).
@@ -91,7 +91,7 @@ Drop/Remove hands    →   Emergency Brake (releases all keys instantly)
 ```
 
 ### ⌨️ Keyboard Shortcuts (Inside the window)
-- **`M` / `m`**: Maximize the camera overlay window for 15 seconds.
+- **`M` / `m`**: Toggle the camera overlay window size between small and maximized/restored.
 - **`Q` / `q` / `ESC`**: Quit the application and release all keys safely.
 
 ---

@@ -462,10 +462,15 @@ def is_fist(hand_landmarks) -> bool:
 
 
 def main():
-    window_name = "Virtual Steering Wheel"
-    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(window_name, 320, 240)  # Start with a small, neat size
-    cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
+    window_hud = "Virtual Steering Wheel HUD"
+    window_ctrl = "Virtual Steering Wheel Controller"
+    
+    cv2.namedWindow(window_hud, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(window_hud, 320, 240)  # Start with a small, neat size
+    cv2.setWindowProperty(window_hud, cv2.WND_PROP_TOPMOST, 1)
+
+    cv2.namedWindow(window_ctrl, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(window_ctrl, 320, 240)
 
     cap = ThreadedCamera(CAMERA_INDEX).start()
     if not cap.is_opened():
@@ -523,6 +528,9 @@ def main():
                 frame = cv2.flip(frame, 1)
 
             h, w = frame.shape[:2]
+            
+            # Create a copy for the movable controller window
+            ctrl_frame = frame.copy()
 
             # Use pre-allocated canvas for zero-allocation transparent rendering
             if TRANSPARENT_HUD:
@@ -545,8 +553,9 @@ def main():
                 for hand_landmarks, handedness in zip(results.multi_hand_landmarks, results.multi_handedness):
                     label = handedness.classification[0].label
 
-                    # Draw on the display canvas instead of camera feed
+                    # Draw on both canvases
                     mp_drawing.draw_landmarks(display_frame, hand_landmarks, mp_hands.HAND_CONNECTIONS, landmark_style, conn_style)
+                    mp_drawing.draw_landmarks(ctrl_frame, hand_landmarks, mp_hands.HAND_CONNECTIONS, landmark_style, conn_style)
 
                     # Check if the hand is making a fist
                     fist_status[label] = is_fist(hand_landmarks)
@@ -563,6 +572,7 @@ def main():
                     rx_n, ry_n, rx_px, ry_px = hand_data["Right"]
 
                     draw_hand_connection(display_frame, (lx_px, ly_px), (rx_px, ry_px))
+                    draw_hand_connection(ctrl_frame, (lx_px, ly_px), (rx_px, ry_px))
                     
                     left_fist = fist_status.get("Left", False)
                     right_fist = fist_status.get("Right", False)
@@ -594,10 +604,19 @@ def main():
 
             draw_hud(display_frame, angle, direction, strength, both_visible, fps, nitro_active, brake_active)
 
+            # Draw controller header details in ctrl_frame
+            cv2.rectangle(ctrl_frame, (10, 10), (310, 55), (20, 20, 30), -1)
+            cv2.rectangle(ctrl_frame, (10, 10), (310, 55), (80, 80, 90), 1)
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(ctrl_frame, "CONTROLLER (Movable)", (20, 28), font, 0.45, (80, 200, 255), 1)
+            hud_status = "MAXIMIZED" if is_large else "MINIMIZED"
+            hud_clr = (80, 230, 130) if is_large else (255, 130, 60)
+            cv2.putText(ctrl_frame, f"HUD: {hud_status} | Press M to toggle", (20, 46), font, 0.38, hud_clr, 1)
+
             # Check window size only once every 15 frames to reduce OS-level blocking query latency
             if frame_count % 15 == 0:
                 try:
-                    rect = cv2.getWindowImageRect(window_name)
+                    rect = cv2.getWindowImageRect(window_hud)
                     if rect is not None and len(rect) == 4:
                         _, _, win_w, win_h = rect
                 except Exception:
@@ -610,7 +629,7 @@ def main():
                 if platform.system() == "Windows":
                     try:
                         import ctypes
-                        hwnd = ctypes.windll.user32.FindWindowW(None, window_name)
+                        hwnd = ctypes.windll.user32.FindWindowW(None, window_hud)
                         if hwnd != 0 and ctypes.windll.user32.IsZoomed(hwnd):
                             is_currently_large = True
                     except Exception:
@@ -629,7 +648,7 @@ def main():
                         # If already large, check if 15 seconds have passed
                         if current_time - large_start_time >= 15.0:
                             print("[INFO] 15 seconds elapsed. Shrinking window back to small.")
-                            restore_and_shrink_window(window_name)
+                            restore_and_shrink_window(window_hud)
                             is_large = False
                             cooldown_until = current_time + 2.0
                             win_w, win_h = 320, 240
@@ -637,14 +656,19 @@ def main():
                     is_large = False
 
             # Only resize if the window dimensions differ from the frame dimensions
+            resized_hud_frame = display_frame
             if win_w > 10 and win_h > 10 and (win_w != w or win_h != h):
-                display_frame = cv2.resize(display_frame, (win_w, win_h), interpolation=cv2.INTER_LINEAR)
+                resized_hud_frame = cv2.resize(display_frame, (win_w, win_h), interpolation=cv2.INTER_LINEAR)
 
-            cv2.imshow(window_name, display_frame)
+            # Controller frame is scaled to 320x240 for standard movable screen layout
+            resized_ctrl_frame = cv2.resize(ctrl_frame, (320, 240), interpolation=cv2.INTER_LINEAR)
+
+            cv2.imshow(window_hud, resized_hud_frame)
+            cv2.imshow(window_ctrl, resized_ctrl_frame)
 
             # Set transparency after the window has been displayed at least once
             if TRANSPARENT_HUD and not transparency_applied:
-                transparency_applied = make_window_transparent(window_name)
+                transparency_applied = make_window_transparent(window_hud)
 
             key = cv2.waitKey(1) & 0xFF
             if key in (ord('q'), ord('Q'), 27):
@@ -655,7 +679,7 @@ def main():
                 if platform.system() == "Windows":
                     try:
                         import ctypes
-                        hwnd = ctypes.windll.user32.FindWindowW(None, window_name)
+                        hwnd = ctypes.windll.user32.FindWindowW(None, window_hud)
                         if hwnd != 0 and ctypes.windll.user32.IsZoomed(hwnd):
                             is_currently_large = True
                     except Exception:
@@ -666,13 +690,13 @@ def main():
 
                 if is_currently_large:
                     print("[INFO] Shortcut: Shrinking window.")
-                    restore_and_shrink_window(window_name)
+                    restore_and_shrink_window(window_hud)
                     is_large = False
                     cooldown_until = time.time() + 2.0
                     win_w, win_h = 320, 240
                 else:
                     print("[INFO] Shortcut: Maximizing window.")
-                    maximize_window(window_name)
+                    maximize_window(window_hud)
                     is_large = True
                     large_start_time = time.time()
                     win_w, win_h = 1280, 960
